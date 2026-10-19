@@ -35,7 +35,7 @@ async function main() {
         const item = new CartItem(itemcode, description, quantity, price);
         cart.push(item);
         //now ask the question whether to repeat the item's bill
-        const repeat: string = await(r1.question("Do you want to add more item(s) to the cart?"));
+        const repeat: string = await(r1.question("Do you want to add more item(s) to the cart [yes/no]?"));
         if(repeat.trim().toLowerCase() =="no") { 
             moreitem = false;
         }
@@ -47,9 +47,43 @@ async function main() {
     console.log("\n Cart contents:");
     console.log(cart);
     console.log("Grand Total:" + grandTotal);
+    const discountedAmount : number = await ApplyMembershipDiscount(r1, grandTotal);
     r1.close();
     }
 
 main();
 
+//note we're not creating a new object, so hence we're not including CreateInterface
+//reuse the same scanner object, so we're passing it into arguments
+async function ApplyMembershipDiscount(r1: readline.Interface,grandTotal: number) {
+    //ask for membershiptype
+    const isMember: string = await r1.question("Do you have membership[yes/no]?");
+    // const gold_discount: number = 0.05;
+    // const silver_discount: number = 0.10;
+    // const platinum_discount: number = 0.15;
+    let discountAmount : number = 0;
+    if(isMember.trim().toLowerCase() =="yes") {
+        //ask for specfic membership status
+        const membershipType : string = await r1.question("What is your membership type[gold/silver/platinum]?");
+        if(membershipType.trim().toLowerCase() =="gold") {
+            discountAmount = grandTotal*0.05;
+        }
+        else if(membershipType.trim().toLowerCase() =="silver") {
+            discountAmount = grandTotal*0.10;
+        }
+        else if(membershipType.trim().toLowerCase() =="platinum"){
+            discountAmount = grandTotal*0.15;
+        }
+        else {
+            discountAmount = 0;
+        }
+    }
+    else {
+        discountAmount = 0;
+    }
+    const discountedAmount: number = grandTotal - discountAmount;
+    console.log("Discount Amount:" + discountAmount);
+    console.log("Discounted amount:" + discountedAmount);
+    return discountAmount;
+}
 
