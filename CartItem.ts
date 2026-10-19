@@ -49,6 +49,7 @@ async function main() {
     console.log("Grand Total:" + grandTotal);
     const discountedAmount : number = await ApplyMembershipDiscount(r1, grandTotal);
     const Total : number = await ApplyGST(discountedAmount);
+    const totalBeforeInvoice: number = await PaymentMode(r1, Total);
     r1.close();
     }
 
@@ -98,10 +99,24 @@ async function ApplyGST(discountedAmount: number) {
     return Total;
 }
 
-// Steps: 1. Use the discounted total from Lab 2. 
-// 2. Compute GST: discountedTotal * gstRate. 
-// 3. Compute platform fee: discountedTotal * platformFeeRate. 
-// 4. Add both to the discounted total.
-// 5. Display updated total with tax and fees. 
-
+async function PaymentMode(r1: readline.Interface, Total: number) {
+    const paymentMode : string = await r1.question("What is your paymentmode[Card/UPI/Cash]?");
+    const surcharge: number = 0.025;
+    const convenienceFeeRate: number = 0.01;
+    let totalBeforeInvoice : number = 0;
+    if(paymentMode.trim().toLowerCase()=="card") {
+        if(Total < 1000) {
+            const surchargeFees: number = Total*0.025;
+            console.log("Surcharge Fees (2.5%):" + surchargeFees);
+            totalBeforeInvoice = Total + surcharge;
+        }
+    }
+    else {
+        const convenienceFees : number = Total*convenienceFeeRate;
+        console.log("Convinence Fees (1%): "+ convenienceFees);
+        totalBeforeInvoice = Total + convenienceFees;
+    }
+    console.log("Final total Before Invoice: " + totalBeforeInvoice);
+    return totalBeforeInvoice;
+} 
 
