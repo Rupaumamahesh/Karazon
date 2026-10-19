@@ -110,6 +110,9 @@ async function PaymentMode(r1: readline.Interface, Total: number) {
             console.log("Surcharge Fees (2.5%):" + surchargeFees);
             totalBeforeInvoice = Total + surcharge;
         }
+        else {
+            totalBeforeInvoice = Total;
+        }
     }
     else {
         const convenienceFees : number = Total*convenienceFeeRate;
